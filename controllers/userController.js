@@ -4,6 +4,9 @@ module.exports = {
 
     getUsers(req, res) {
         User.find()
+            .select('-__v')
+            .populate({ path: 'thought', selcet: '-__v' })
+            .populate({ path:'friends', selcet: '-__v' })
             .then((users) => res.json(users))
             .catch((err) => res.status(500).json(err));
     },
@@ -66,6 +69,8 @@ module.exports = {
             { $addToSet: { friend: req.body } },
             { runValidators: true, new: true }
         )
+        .select('-__v')
+        .populate({ path:'friends', selcet: '-__v' })
         .then((user) => 
         !user
         ? res.status(404).json({ message: 'No user with that ID' })
@@ -80,6 +85,8 @@ module.exports = {
             { $pull: { friend: { friendId: req.params.friendId } } },
             { runValidators: true, new: true }
         )
+        .select('-__v')
+        .populate({ path:'friends', selcet: '-__v' })
         .then((user) => 
         !user
         ? res.status(404).json({ message: 'No user with that ID' })
